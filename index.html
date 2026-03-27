@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JSP</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#081224">
+
+<style>
+body {
+  margin:0;
+  font-family:Arial;
+  background:linear-gradient(180deg,#081224,#0d1830);
+  color:white;
+  padding:20px 15px 90px;
+}
+
+.card {
+  background:rgba(255,255,255,0.08);
+  border-radius:25px;
+  padding:20px;
+  margin-bottom:15px;
+  backdrop-filter:blur(12px);
+}
+
+h1 {margin:0;font-size:40px;}
+
+.task {
+  display:flex;
+  justify-content:space-between;
+  padding:18px;
+  border-radius:20px;
+  margin-bottom:12px;
+  background:rgba(255,255,255,0.08);
+  transition:0.2s;
+}
+
+.task.done {
+  background:rgba(34,197,94,0.3);
+}
+
+button {
+  width:100%;
+  padding:16px;
+  border-radius:20px;
+  border:none;
+  margin-top:10px;
+  font-weight:bold;
+  font-size:16px;
+}
+
+.primary {
+  background:linear-gradient(90deg,#22c55e,#84cc16);
+}
+
+.danger {
+  background:#ef4444;
+}
+
+.nav {
+  position:fixed;
+  bottom:0;
+  width:100%;
+  left:0;
+  display:flex;
+  justify-content:space-around;
+  padding:10px;
+  background:rgba(8,18,36,0.95);
+}
+
+.nav button {
+  background:rgba(255,255,255,0.1);
+  border-radius:15px;
+  padding:10px;
+}
+
+.active {display:block;}
+.screen {display:none;}
+
+textarea {
+  width:100%;
+  height:180px;
+  border-radius:15px;
+  border:none;
+  padding:10px;
+  background:rgba(255,255,255,0.08);
+  color:white;
+}
+
+.quote {
+  font-size:18px;
+  line-height:1.5;
+}
+</style>
+</head>
+
+<body>
+
+<div id="home" class="screen active">
+
+<div class="card">
+<h1>JSP</h1>
+<p id="streak">0 🔥</p>
+</div>
+
+<div class="task" onclick="toggle(0)">📖 Bible</div>
+<div class="task" onclick="toggle(1)">🙏 Prayer</div>
+<div class="task" onclick="toggle(2)">✍️ Journal</div>
+<div class="task" onclick="toggle(3)">🧠 Work</div>
+
+<button class="primary" onclick="completeDay()">Complete Day</button>
+<button class="danger" onclick="clearStreak()">Clear Streak</button>
+
+</div>
+
+<div id="journal" class="screen">
+<div class="card">
+<h2>Journal</h2>
+<textarea id="journalBox"></textarea>
+</div>
+</div>
+
+<div id="verse" class="screen">
+<div class="card">
+<h2>Verse</h2>
+<p class="quote" id="verseText"></p>
+<p id="verseRef"></p>
+<button onclick="newVerse()">New Verse</button>
+</div>
+</div>
+
+<div class="nav">
+<button onclick="switchTab('home')">Home</button>
+<button onclick="switchTab('journal')">Journal</button>
+<button onclick="switchTab('verse')">Verse</button>
+</div>
+
+<script>
+let tasks = JSON.parse(localStorage.getItem("tasks")) || [false,false,false,false];
+let streak = parseInt(localStorage.getItem("streak")) || 0;
+
+const verses = [
+{text:"I can do all things through Christ.",ref:"Philippians 4:13"},
+{text:"Be strong and courageous.",ref:"Joshua 1:9"},
+{text:"Trust in the Lord.",ref:"Proverbs 3:5"},
+{text:"God is our refuge and strength.",ref:"Psalm 46:1"}
+];
+
+function toggle(i){
+tasks[i]=!tasks[i];
+save();
+update();
+}
+
+function save(){
+localStorage.setItem("tasks",JSON.stringify(tasks));
+localStorage.setItem("streak",streak);
+}
+
+function update(){
+document.getElementById("streak").innerText=streak+" 🔥";
+document.querySelectorAll(".task").forEach((t,i)=>{
+t.classList.toggle("done",tasks[i]);
+});
+}
+
+function completeDay(){
+if(tasks.every(t=>t)){
+streak++;
+tasks=[false,false,false,false];
+save();
+update();
+} else {
+alert("Finish everything first");
+}
+}
+
+function clearStreak(){
+streak=0;
+save();
+update();
+}
+
+function newVerse(){
+let v=verses[Math.floor(Math.random()*verses.length)];
+document.getElementById("verseText").innerText=v.text;
+document.getElementById("verseRef").innerText=v.ref;
+}
+
+function switchTab(tab){
+document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+document.getElementById(tab).classList.add("active");
+}
+
+update();
+newVerse();
+</script>
+
+</body>
+</html>
